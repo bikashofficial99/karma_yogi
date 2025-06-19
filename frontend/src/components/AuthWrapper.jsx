@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
   FaFacebookF,
   FaInstagram,
@@ -10,7 +10,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext"; // ✅ Import context
+import { AuthContext } from "../contexts/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -23,30 +25,42 @@ const AuthForm = () => {
   });
   const [errors, setErrors] = useState({});
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-  const { login, isLoggedIn } = useContext(AuthContext); // ✅ Get isLoggedIn
-  // if (isLoggedIn) return null; // ✅ Don't render AuthForm if logged in
+  const { login, isLoggedIn } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (isLoggedIn) navigate("/Home");
+  }, [isLoggedIn, navigate]);
 
   const toggleTheme = () => {
-    setIsDarkMode((prevMode) => !prevMode);
+    setIsDarkMode((prev) => !prev);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      fullName: "",
+      location: "",
+      email: "",
+      password: "",
+      photo: null,
+    });
+    setErrors({});
   };
 
   const validateForm = () => {
     const newErrors = {};
+    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email";
+    }
+    if (!formData.password || formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long";
+    }
 
-    if (isLogin) {
-      if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email))
-        newErrors.email = "Please enter a valid email";
-      if (!formData.password || formData.password.length < 6)
-        newErrors.password = "Password must be at least 6 characters long";
-    } else {
+    if (!isLogin) {
       if (!formData.fullName) newErrors.fullName = "Full name is required";
       if (!formData.location) newErrors.location = "Location is required";
-      if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email))
-        newErrors.email = "Please enter a valid email";
-      if (!formData.password || formData.password.length < 6)
-        newErrors.password = "Password must be at least 6 characters long";
       if (!formData.photo) newErrors.photo = "Please upload your photo";
     }
 
@@ -58,18 +72,16 @@ const AuthForm = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    setLoading(true);
     try {
-     if (isLogin) {
-  const res = await axios.post("/api/users/login", {
-    email: formData.email,
-    password: formData.password,
-  });
-
-  login(res.data.token, res.data.user); // ✅ Fixed here
-  alert("Login successful");
-  navigate("/Home");
-
-
+      if (isLogin) {
+        const res = await axios.post("/api/users/login", {
+          email: formData.email,
+          password: formData.password,
+        });
+        login(res.data.token, res.data.user);
+        toast.success("Logged in successfully!");
+        navigate("/Home");
       } else {
         const data = new FormData();
         data.append("name", formData.fullName);
@@ -82,28 +94,33 @@ const AuthForm = () => {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
-        alert("Account created successfully");
-        setIsLogin(true); // Switch to login
+        toast.success("Account created successfully! Please log in.");
+        setIsLogin(true);
+        resetForm();
       }
     } catch (err) {
-      alert(err.response?.data?.message || "Something went wrong");
+      toast.error(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleFileChange = (e, field) => {
-    const file = e.target.files[0];
-    setFormData((prev) => ({
-      ...prev,
-      [field]: file,
-    }));
+  const handleFileChange = (e) => {
+    setFormData((prev) => ({ ...prev, photo: e.target.files[0] }));
+  };
+
+  const handleToggleLogin = () => {
+    setIsLogin((prev) => !prev);
+    resetForm();
   };
 
   return (
-    <div
+     <div
       className={`flex items-center justify-center min-h-screen ${
         isDarkMode ? "bg-[#0E1412]" : "bg-white"
       } px-4`}
     >
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="w-full max-w-[850px] h-[600px] bg-white backdrop-blur-lg rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.2)] border border-white/20 flex overflow-hidden relative">
         <div
           onClick={toggleTheme}

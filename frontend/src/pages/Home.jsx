@@ -7,6 +7,7 @@ import 'swiper/css';
 import 'swiper/css/autoplay';
 import { Autoplay } from 'swiper/modules';
 import { FaUserCheck, FaClipboardList, FaSmile, FaPen, FaTools, FaStar } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const jobList = [
   { title: "Carpenter", location: "Bharatpur" },
@@ -74,9 +75,11 @@ const Home = () => {
           <p className="text-green-500 font-semibold mt-4 text-lg sm:text-xl">
             KARMA YOGI
           </p>
-          <button className="mt-6 bg-green-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-md font-bold hover:bg-green-700 transition">
-            Browse Jobs
-          </button>
+          <Link to="/jobs">
+      <button className="mt-6 bg-green-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-md font-bold hover:bg-green-700 transition">
+        Browse Jobs
+      </button>
+    </Link>
         </div>
       </section>
 

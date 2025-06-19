@@ -1,5 +1,6 @@
 import logo from "../assets/logo.png";
 import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -18,14 +19,22 @@ const Footer = () => {
 
           {/* Navigation */}
           <div>
-            <h4 className="font-semibold mb-4">Navigation</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li>Home</li>
-              <li>Jobs</li>
-              <li>Contact</li>
-              <li>About</li>
-            </ul>
-          </div>
+  <h4 className="font-semibold mb-4">Navigation</h4>
+  <ul className="space-y-2 text-sm text-gray-400">
+    <li>
+      <Link to="/" className="hover:text-white transition">Home</Link>
+    </li>
+    <li>
+      <Link to="/jobs" className="hover:text-white transition">Jobs</Link>
+    </li>
+    <li>
+      <Link to="/contact" className="hover:text-white transition">Contact</Link>
+    </li>
+    <li>
+      <Link to="/about" className="hover:text-white transition">About</Link>
+    </li>
+  </ul>
+</div>
 
           {/* Social Media */}
           <div>

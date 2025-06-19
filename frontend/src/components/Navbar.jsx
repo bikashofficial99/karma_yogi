@@ -45,11 +45,14 @@ const avatarUrl = user?.profile?.avatar
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-2">
+                    <Link to="/home">
+          
           <img
             src={logo}
             alt="Logo"
             className="w-12 h-12 transition-transform duration-300 hover:scale-110"
           />
+          </Link>
         </div>
 
         {/* Hamburger Icon */}

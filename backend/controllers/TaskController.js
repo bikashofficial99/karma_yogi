@@ -2,13 +2,26 @@ const Task = require('../models/TaskModel');
 
 exports.createTask = async (req, res) => {
   try {
-    const task = new Task({ ...req.body, createdBy: req.user.id });
+    const { title, description, category, location, budget, dueDate } = req.body;
+
+    const task = new Task({
+      title,
+      description,
+      category,
+      location,
+      budget,
+      dueDate: new Date(dueDate),
+      createdBy: req.user.id // assuming auth middleware adds req.user
+    });
+
     await task.save();
     res.status(201).json(task);
   } catch (err) {
-    res.status(500).json({ message: 'Error creating task' });
+    console.error(err);
+    res.status(500).json({ message: 'Error creating task', error: err.message });
   }
 };
+
 
 exports.getTasks = async (req, res) => {
   try {
